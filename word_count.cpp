@@ -10,34 +10,39 @@
 #include <utility>
 #include <vector>	
 #include <algorithm>
-
+#define StringIntPair pair<string, int>
 using namespace std;
 
 int count = 0;
 
 // map function
-pair<string, int> mapFunc(string word){
+StringIntPair mapFunc(const string &word){
 	int value = 1;
-	pair<string, int> key_val_pair;
+    StringIntPair key_val_pair;
 	key_val_pair.first = word;
 	key_val_pair.second = value;
 	return key_val_pair;
 }
 
 //reduce function
-pair<string,int> reduceFunc(vector<pair<string,int> > dup_vector){
-	pair<string, int> combined_pair;
+StringIntPair reduceFunc(vector<StringIntPair> dup_vector){
+    StringIntPair combined_pair;
 	combined_pair.first = dup_vector[0].first;
 	combined_pair.second = dup_vector.size();
 	return combined_pair;
 }
 
+bool compFuncDescending(const StringIntPair a, const StringIntPair b)
+{
+    return (a.second > b.second);
+}
+
 int main(){
 	vector<string> word_vector; // holds input item: vector of words parsed from input file
-	vector<pair<string, int> > pair_vector;	// holds initial mapped pairs
-	vector<pair<string, int> > dup_vector;	// holds duplicate pairs to be reduced
-	vector<pair<string, int> > used_vector;	// keeps track of which pairs have been tested for duplicity
-	vector<pair<string, int> > reduced_vector;	// holds the final reduced pairs for word_count output
+	vector<StringIntPair> pair_vector;	// holds initial mapped pairs
+	vector<StringIntPair> dup_vector;	// holds duplicate pairs to be reduced
+	vector<StringIntPair> used_vector;	// keeps track of which pairs have been tested for duplicity
+	vector<StringIntPair> reduced_vector;	// holds the final reduced pairs for word_count output
 	string word;
 
 	// STEP 1: read in file
@@ -80,6 +85,8 @@ int main(){
 		dup_vector.clear();
 	}
 
+	// STEP 3.5: sort the reduced vector in descending
+	std::sort(reduced_vector.begin(), reduced_vector.end(), compFuncDescending);
 
 	// STEP 4: output
 	for (int i = 0; i<reduced_vector.size(); i++){
