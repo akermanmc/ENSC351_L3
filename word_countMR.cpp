@@ -14,6 +14,16 @@
 using namespace std;
 
 int count = 0;
+ifstream inFile;
+
+// input function
+vector<string> inputReadFunc(vector<string> word_vector){
+	string word;
+	while (inFile >> word){
+		word_vector.push_back(word);
+	}
+	return word_vector;
+}
 
 // map function
 pair<string, int> mapFunc(string word){
@@ -32,26 +42,27 @@ pair<string,int> reduceFunc(vector<pair<string,int> > dup_vector){
 	return combined_pair;
 }
 
+//output function
+void outputFunc(vector<pair<string, int> > reduced_vector){
+	for (int i = 0; i<reduced_vector.size(); i++){
+		cout << reduced_vector[i].first << "," << reduced_vector[i].second << endl;
+	}
+}
+
 int main(){
 	vector<string> word_vector; // holds input item: vector of words parsed from input file
 	vector<pair<string, int> > pair_vector;	// holds initial mapped pairs
 	vector<pair<string, int> > dup_vector;	// holds duplicate pairs to be reduced
 	vector<pair<string, int> > used_vector;	// keeps track of which pairs have been tested for duplicity
 	vector<pair<string, int> > reduced_vector;	// holds the final reduced pairs for word_count output
-	string word;
 
 	// STEP 1: read in file
-	ifstream inFile;
 	inFile.open("words.txt");
 	if(!inFile.is_open()){
 		cout << "open failed" << endl; 
 		return 1;
 	}
-
-	while (inFile >> word){
-		word_vector.push_back(word);
-		//count ++;
-	}
+	word_vector = inputReadFunc(word_vector);
 
 	inFile.close();
 
@@ -82,9 +93,7 @@ int main(){
 
 
 	// STEP 4: output
-	for (int i = 0; i<reduced_vector.size(); i++){
-		cout << reduced_vector[i].first << "," << reduced_vector[i].second << endl;
-	}
+	outputFunc(reduced_vector);
 
 	return 0;
 
