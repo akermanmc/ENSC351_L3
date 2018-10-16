@@ -28,7 +28,7 @@ bool compFuncDescending(const StringIntPair a, const StringIntPair b)
 }
 
 // input function
-vector<string> inputReadFunc(vector<string> word_vector){
+vector<string> inputReadFunc(vector<string> &word_vector){
 	string word;
 	while (inFile >> word){
 		word_vector.push_back(word);
@@ -37,7 +37,7 @@ vector<string> inputReadFunc(vector<string> word_vector){
 }
 
 // map function
-pair<string, int> mapFunc(const string &word){
+StringIntPair mapFunc(const string &word){
 	int value = 1;
     StringIntPair key_val_pair;
 	key_val_pair.first = word;
@@ -46,7 +46,7 @@ pair<string, int> mapFunc(const string &word){
 }
 
 //reduce function
-pair<string,int> reduceFunc(const vector<StringIntPair> &dup_vector){
+StringIntPair reduceFunc(const vector<StringIntPair> &dup_vector){
     StringIntPair combined_pair;
 	combined_pair.first = dup_vector[0].first;
 	combined_pair.second = dup_vector.size();
@@ -54,7 +54,7 @@ pair<string,int> reduceFunc(const vector<StringIntPair> &dup_vector){
 }
 
 //output function
-void outputFunc(const vector<StringIntPair> reduced_vector){
+void outputFunc(const vector<StringIntPair> &reduced_vector){
 	for (int i = 0; i<reduced_vector.size(); i++){
 		cout << reduced_vector[i].first << "," << reduced_vector[i].second << endl;
 	}
