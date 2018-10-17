@@ -49,6 +49,7 @@ public:
 
 ifstream inFile;
 unsigned long int numThreads;
+vector<my2DArray> word_vector; // holds input item: vector of words parsed from input file
 vector<IntIntPair> pair_vector;	// holds initial mapped pairs
 vector<vector<IntIntPair>> dup_vector;	// vector of vector!! wohoo! holds duplicate pairs to be reduced as distinct vectors
 vector<IntIntPair> reduced_vector;	// holds the final reduced pairs for word_count output
@@ -88,7 +89,7 @@ bool compFuncDescending(const IntIntPair a, const IntIntPair b)
 }
 
 // input function
-inputReadFunc(vector<my2DArray> &word_vector){
+void inputReadFunc(vector<my2DArray> &word_vector){
     my2DArray word;
     while (!inFile.eof()){
         for(int i = 0; i < N; i++)
@@ -96,7 +97,6 @@ inputReadFunc(vector<my2DArray> &word_vector){
                 inFile >> word.Matrix[i][j];
         word_vector.push_back(word);
     }
-    return word_vector;
 }
 
 // map function
@@ -150,8 +150,6 @@ void* reduceProc(void* arg){
 }
 
 int main(){
-    vector<my2DArray> word_vector; // holds input item: vector of words parsed from input file
-
     // STEP 1: read in file
     inFile.open("matrices.txt");
     if(!inFile.is_open()){
@@ -167,12 +165,6 @@ int main(){
     vector<int> threadPosVector(numThreads);
 
     // STEP 2: map
-    //Step 2.1: create smaller vectors
-    vector<vector<my2DArray>> smallVectors(numThreads);
-    for(int i = 0; i < numThreads; i++)
-    {
-        smallVectors[i] = vector<my2DArray>((word_vector.begin() + i*(word_vector.size()/numThreads), (word_vector.begin() + (i+1)*(word_vector.size()/numThreads - 1));
-    }
     for (int i = 0; i<numThreads; i++){
         threadPosVector[i] = i;
         pthread_create(&threadVector[i], NULL, mapProc, &threadPosVector[i]);
