@@ -11,6 +11,7 @@
 #include <utility>
 #include <vector>	
 #include <algorithm>
+#include "tracelib.h"
 #define StringIntPair pair<string, int>
 using namespace std;
 
@@ -68,6 +69,7 @@ void* mapProc(void* arg){
     {
         StringIntPair temp = mapFunc(word_vector[pos]);
         pthread_mutex_lock(&lock);
+        trace_instant_global("Mapped");
         pair_vector.push_back(temp);
         pthread_mutex_unlock(&lock);
         pos += numThreads;
@@ -81,6 +83,7 @@ void* reduceProc(void* arg){
     while(pos < size){
         StringIntPair temp = reduceFunc(dup_vector[pos]);
         pthread_mutex_lock(&lock);
+        trace_instant_global("Reduced");
         reduced_vector.push_back(temp);
         pthread_mutex_unlock(&lock);
         pos += numThreads;
@@ -88,6 +91,10 @@ void* reduceProc(void* arg){
 }
 
 int main(){
+    //begin trace
+    trace_start("Word_CountMR_Output.json");
+    trace_event_start("Main","Main",NULL);
+
 	// STEP 1: read in file
 	inFile.open("words.txt");
 	if(!inFile.is_open()){
@@ -101,7 +108,7 @@ int main(){
 	numThreads = thread::hardware_concurrency();
     vector<pthread_t> threadVector(numThreads);
     vector<int> threadPosVector(numThreads);
-
+    trace_event_start("Mapping","Main", NULL);
     // STEP 2: map
 	for (int i = 0; i<numThreads; i++){
 	    threadPosVector[i] = i;
@@ -111,7 +118,8 @@ int main(){
 	for (int i = 0; i<numThreads; i++){
 	    pthread_join(threadVector[i],NULL);
 	}
-
+    trace_event_end(NULL);
+    trace_event_start("Grouping", "Main",NULL);
 	//form dup_vector structure with separate vectors for all unique words
 	for (int i = 0; i < pair_vector.size(); i++)
     {
@@ -131,6 +139,8 @@ int main(){
             dup_vector.push_back(temp);
         }
     }
+    trace_event_end(NULL);
+    trace_event_start("Reduce", "Main", NULL);
     //STEP3: reduce
     for (int i = 0; i<numThreads; i++){
         threadPosVector[i] = i;
@@ -143,7 +153,13 @@ int main(){
 
     // STEP 3.5: sort the reduced vector in descending
     std::sort(reduced_vector.begin(), reduced_vector.end(), compFuncDescending);
-
+    trace_event_end(NULL);
+    trace_event_start("Output", "Main",NULL);
     // STEP 4: output
     outputFunc(reduced_vector);
+    trace_event_end(NULL);
+
+    trace_event_end(NULL);
+    trace_end();
+    return 0;
 }

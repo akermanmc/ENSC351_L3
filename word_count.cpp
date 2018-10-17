@@ -10,6 +10,7 @@
 #include <utility>
 #include <vector>	
 #include <algorithm>
+#include "tracelib.h"
 #define StringIntPair pair<string, int>
 using namespace std;
 
@@ -45,6 +46,9 @@ int main(){
 	vector<StringIntPair> reduced_vector;	// holds the final reduced pairs for word_count output
 	string word;
 
+	trace_start("Word_Count_Output.json");
+	trace_event_start("Main","Main",NULL);
+
 	// STEP 1: read in file
 	ifstream inFile;
 	inFile.open("words.txt");
@@ -60,12 +64,13 @@ int main(){
 
 	inFile.close();
 
-
+	trace_event_start("Mapping","Main", NULL);
 	// STEP 2: map
 	for (int i = 0; i<word_vector.size(); i++){
+		trace_instant_global("Mapped");
 		pair_vector.push_back(mapFunc(word_vector[i]));
 	}
-
+	trace_event_start("Reduce", "Main",NULL);
 	// STEP 3: reduce: send vectors of duplicates to reduce function
 	for (int i= 0; i<pair_vector.size(); i++){
 		if (find(used_vector.begin(), used_vector.end(), pair_vector[i]) != used_vector.end()){
@@ -78,21 +83,22 @@ int main(){
 				dup_vector.push_back(pair_vector[j]);
 			}
 		}
-		/*for (int i=0; i<dup_vector.size();i++)
-			cout << dup_vector[i].first << dup_vector[i].second << endl;
-		cout << endl;*/
+		trace_instant_global("Reduced");
 		reduced_vector.push_back(reduceFunc(dup_vector));
 		dup_vector.clear();
 	}
 
 	// STEP 3.5: sort the reduced vector in descending
 	std::sort(reduced_vector.begin(), reduced_vector.end(), compFuncDescending);
-
+	trace_event_end(NULL);
+	trace_event_start("Output", "Main",NULL);
 	// STEP 4: output
 	for (int i = 0; i<reduced_vector.size(); i++){
 		cout << reduced_vector[i].first << "," << reduced_vector[i].second << endl;
 	}
-
+	trace_event_end(NULL);
+	trace_event_end(NULL);
+	trace_end();
 	return 0;
 
 }
