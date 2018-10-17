@@ -13,7 +13,7 @@
 #define IntIntPair pair<long long int, int>
 using namespace std;
 
-#define N 6
+#define N 10
 
 class my2DArray{
 public:

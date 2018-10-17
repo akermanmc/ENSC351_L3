@@ -12,7 +12,7 @@
 #include <vector>
 #include <algorithm>
 #define IntIntPair pair<long long int, int>
-#define N 6
+#define N 10
 using namespace std;
 
 class my2DArray{
